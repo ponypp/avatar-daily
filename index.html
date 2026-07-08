@@ -381,6 +381,105 @@
     /* ===== Compliance ===== */
     .compliance { text-align: center; font-size: 10px; color: #4a4a5a; padding: 10px; }
 
+    /* ===== Generation Overlay (全屏生成中) ===== */
+    .gen-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.88);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .gen-overlay__card {
+      background: #1a1a2e;
+      border: 1px solid #2a2a40;
+      border-radius: 16px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 340px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    .gen-overlay__spinner {
+      width: 56px;
+      height: 56px;
+      border: 4px solid #2a2a40;
+      border-top-color: #c9a96e;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .gen-overlay__title { font-size: 18px; font-weight: 600; color: #c9a96e; margin-bottom: 4px; }
+    .gen-overlay__subtitle { font-size: 12px; color: #8888a0; margin-bottom: 20px; }
+    .gen-overlay__step {
+      font-size: 14px;
+      color: #e6e6f0;
+      margin-bottom: 8px;
+      min-height: 20px;
+      font-weight: 500;
+    }
+    .gen-overlay__step-icon {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      line-height: 16px;
+      text-align: center;
+      margin-right: 6px;
+      border-radius: 50%;
+      font-size: 11px;
+      background: #c9a96e;
+      color: #0f0f1a;
+    }
+    .gen-overlay__progress {
+      background: #0f0f1a;
+      height: 6px;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .gen-overlay__bar {
+      background: linear-gradient(90deg, #c9a96e 0%, #f5d68a 100%);
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+      box-shadow: 0 0 8px rgba(201, 169, 110, 0.4);
+    }
+    .gen-overlay__time {
+      font-size: 12px;
+      color: #8888a0;
+      margin-bottom: 20px;
+      font-variant-numeric: tabular-nums;
+    }
+    .gen-overlay__cancel {
+      background: #2a2a40;
+      color: #e6e6f0;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      min-height: 44px;
+      min-width: 100px;
+    }
+    .gen-overlay__cancel:active { background: #3a3a55; }
+    .gen-overlay__hint {
+      font-size: 11px;
+      color: #6b6b80;
+      margin-top: 12px;
+      line-height: 1.5;
+    }
+    /* 步骤图标不同状态 */
+    .gen-overlay__step--done .gen-overlay__step-icon { background: #4ade80; }
+    .gen-overlay__step--active .gen-overlay__step-icon { background: #c9a96e; animation: pulse 1s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .gen-overlay__step--pending { opacity: 0.4; }
+    .gen-overlay__step--pending .gen-overlay__step-icon { background: #2a2a40; }
+
     /* ===== Mobile Responsive ===== */
     /* 小屏手机 (≤ 480px) */
     @media (max-width: 480px) {
@@ -509,12 +608,11 @@
   <div id="dayun-block"></div>
 </div>
 
-<!-- 今日头像 -->
-<div class="section">
-  <div class="section-title">今日头像</div>
-  <div id="today-avatar"></div>
-  <div id="genStatus" class="hidden">排盘 + AI 绘图中(约 10-20 秒)</div>
-</div>
+  <!-- 今日头像 -->
+  <div class="section">
+    <div class="section-title">今日头像</div>
+    <div id="today-avatar"></div>
+  </div>
 
 <!-- 历史头像 -->
 <div class="section">
@@ -535,6 +633,37 @@
   <button onclick="document.getElementById('today-header').scrollIntoView({behavior:'smooth'})">↑ 顶</button>
   <button id="btnGenerate">生成今日</button>
   <button onclick="document.getElementById('history-grid').scrollIntoView({behavior:'smooth'})">↓ 历史</button>
+</div>
+
+<!-- 全屏生成中遮罩 -->
+<div id="genOverlay" class="gen-overlay hidden">
+  <div class="gen-overlay__card">
+    <div class="gen-overlay__spinner"></div>
+    <div class="gen-overlay__title">生成今日头像中</div>
+    <div class="gen-overlay__subtitle">约 10-20 秒,请稍候</div>
+    <div class="gen-overlay__step gen-overlay__step--active" id="genStep1">
+      <span class="gen-overlay__step-icon">1</span>
+      <span id="genStep1Text">排盘中</span>
+    </div>
+    <div class="gen-overlay__step gen-overlay__step--pending" id="genStep2">
+      <span class="gen-overlay__step-icon">2</span>
+      <span id="genStep2Text">拼装 prompt</span>
+    </div>
+    <div class="gen-overlay__step gen-overlay__step--pending" id="genStep3">
+      <span class="gen-overlay__step-icon">3</span>
+      <span id="genStep3Text">调 worker 生成</span>
+    </div>
+    <div class="gen-overlay__step gen-overlay__step--pending" id="genStep4">
+      <span class="gen-overlay__step-icon">4</span>
+      <span id="genStep4Text">拉取图片</span>
+    </div>
+    <div class="gen-overlay__progress" style="margin-top: 16px;">
+      <div class="gen-overlay__bar" id="genBar"></div>
+    </div>
+    <div class="gen-overlay__time" id="genTime">已等待 0.0 秒</div>
+    <button type="button" class="gen-overlay__cancel" id="btnCancelGen">取消生成</button>
+    <div class="gen-overlay__hint">如果卡超过 30 秒,可点取消重新尝试</div>
+  </div>
 </div>
 
 <!-- Modal: 个人资料 / 设置 -->

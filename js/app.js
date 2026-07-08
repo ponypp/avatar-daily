@@ -125,27 +125,87 @@ function renderMain() {
   UI.renderHistory(avatars);
 }
 
-// ============ 4. 生成头像 ============
+// ============ 4. 生成头像(带全屏进度遮罩)============
+let _genStartTime = 0;
+let _genTimer = null;
+let _genAborted = false;
+
+function showGenOverlay() {
+  _genAborted = false;
+  _genStartTime = Date.now();
+  const overlay = document.getElementById('genOverlay');
+  if (overlay) overlay.classList.remove('hidden');
+  // 重置所有步骤
+  for (let i = 1; i <= 4; i++) {
+    const step = document.getElementById(`genStep${i}`);
+    if (step) {
+      step.classList.remove('gen-overlay__step--done', 'gen-overlay__step--active');
+      step.classList.add('gen-overlay__step--pending');
+    }
+  }
+  const bar = document.getElementById('genBar');
+  if (bar) bar.style.width = '0%';
+  // 启动计时器
+  if (_genTimer) clearInterval(_genTimer);
+  _genTimer = setInterval(() => {
+    const t = ((Date.now() - _genStartTime) / 1000).toFixed(1);
+    const el = document.getElementById('genTime');
+    if (el) el.textContent = `已等待 ${t} 秒`;
+  }, 100);
+  // 标记第一步 active
+  updateGenStep(1, 'active');
+}
+
+function updateGenStep(stepNum, state) {
+  const step = document.getElementById(`genStep${stepNum}`);
+  if (!step) return;
+  step.classList.remove('gen-overlay__step--pending', 'gen-overlay__step--active', 'gen-overlay__step--done');
+  step.classList.add(`gen-overlay__step--${state}`);
+  // 更新进度条
+  const bar = document.getElementById('genBar');
+  if (bar) {
+    const pct = { 1: 15, 2: 30, 3: 60, 4: 90 }[stepNum] || 0;
+    bar.style.width = pct + '%';
+  }
+}
+
+function hideGenOverlay() {
+  const overlay = document.getElementById('genOverlay');
+  if (overlay) overlay.classList.add('hidden');
+  if (_genTimer) { clearInterval(_genTimer); _genTimer = null; }
+}
+
 async function onGenerate() {
   const user = Store.getUser();
   if (!user) { UI.openProfileModal({}); return; }
-  const settings = Store.getSettings();
   if (!getProxyUrl()) { alert('请先在设置中配置代理 URL'); UI.openSettingsModal(); return; }
 
-  const btn = document.getElementById('btnGenerate') || document.getElementById('btnRegen');
+  const btn = document.getElementById('btnGenerate');
   if (btn) btn.disabled = true;
-  UI.show('genStatus');
+
+  showGenOverlay();
+  let success = false;
 
   try {
+    // 步骤 1: 排盘
+    updateGenStep(1, 'active');
+    await new Promise(r => setTimeout(r, 50)); // 让 UI 渲染
     const baziV5 = getBaziForUser(user);
     if (!baziV5) throw new Error('八字计算失败');
+    if (_genAborted) throw new Error('用户取消');
+    updateGenStep(1, 'done');
+    updateGenStep(1, 'done');
+    document.getElementById('genStep1Text').textContent = `排盘完成 · ${baziV5.strength.state}`;
+
+    // 步骤 2: 拼装 prompt
+    updateGenStep(2, 'active');
+    await new Promise(r => setTimeout(r, 50));
 
     const today = todayIso();
     const todayFortune = getTodayFortune(user);
 
-    // 流日判定
     const dailyLevel = classifyDailyLevel(
-      null, // 不需要 dailyWuxing,函数内部从 dailyGan 推
+      null,
       baziV5.yongShen.xiSet,
       baziV5.yongShen.jiSet,
       todayFortune.ganzhi[0],
@@ -153,7 +213,6 @@ async function onGenerate() {
       baziV5.bazi.day.zhi,
     );
 
-    // 5 层 prompt
     const { positive, negative } = buildPrompt({
       style: user.style,
       dayMasterElem: baziV5.strength.dayMasterElement,
@@ -171,9 +230,24 @@ async function onGenerate() {
       gender: user.gender,
       scene: user.scene,
     });
+    if (_genAborted) throw new Error('用户取消');
+    updateGenStep(2, 'done');
+    document.getElementById('genStep2Text').textContent = `Prompt 就绪 · ${positive.length} 字`;
 
-    // 调 worker
+    // 步骤 3: 调 worker
+    updateGenStep(3, 'active');
+    document.getElementById('genStep3Text').textContent = 'MiniMax 生成中(可能 10-20 秒)...';
+    const t0 = Date.now();
     const { dataUrl, rawUrl } = await generateAvatar({ positive, negative });
+    if (_genAborted) throw new Error('用户取消');
+    const workerSec = ((Date.now() - t0) / 1000).toFixed(1);
+    updateGenStep(3, 'done');
+    document.getElementById('genStep3Text').textContent = `生成完成 · ${workerSec}s`;
+
+    // 步骤 4: 拉取图片
+    updateGenStep(4, 'active');
+    document.getElementById('genStep4Text').textContent = '存储中...';
+    await new Promise(r => setTimeout(r, 50));
 
     // 保存
     const rec = {
@@ -191,17 +265,26 @@ async function onGenerate() {
       dailyLevel,
     };
     Store.addAvatar(rec);
+    if (_genAborted) throw new Error('用户取消');
+    updateGenStep(4, 'done');
+    document.getElementById('genStep4Text').textContent = '已保存到历史';
+    const bar = document.getElementById('genBar');
+    if (bar) bar.style.width = '100%';
+    success = true;
     renderMain();
   } catch (err) {
-    const msg = (err && err.message) || String(err);
-    const isCors = msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('CORS');
-    const hint = isCors
-      ? '浏览器无法直连 MiniMax(CORS 限制)。默认代理 URL 已填好,确认 设置 → CORS 代理 URL 没被清空;如代理也连不上,可能是 worker 失效或网络问题。'
-      : '请检查 API key、网络、模型余额。';
-    alert('生成失败:\n\n' + msg + '\n\n' + hint);
+    if (err.message === '用户取消') {
+      // 隐藏遮罩,直接返回
+    } else {
+      const msg = (err && err.message) || String(err);
+      const isCors = msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('CORS');
+      const hint = isCors
+        ? '浏览器无法直连 MiniMax(CORS 限制)。默认代理 URL 已填好,确认 设置 → CORS 代理 URL 没被清空;如代理也连不上,可能是 worker 失效或网络问题。'
+        : '请检查 API key、网络、模型余额。';
+      alert('生成失败:\n\n' + msg + '\n\n' + hint);
+    }
   } finally {
-    UI.hide('genStatus');
-    const btn = document.getElementById('btnGenerate') || document.getElementById('btnRegen');
+    hideGenOverlay();
     if (btn) btn.disabled = false;
   }
 }
@@ -275,6 +358,13 @@ function start() {
   // 监听头像区自定义事件(由 ui.js 渲染头像时绑定后 dispatch)
   document.addEventListener('app:generate', () => onGenerate());
   document.addEventListener('app:regenerate', () => onGenerate());
+
+  // 取消生成按钮
+  document.getElementById('btnCancelGen')?.addEventListener('click', () => {
+    _genAborted = true;
+    const el = document.getElementById('genStep3Text');
+    if (el) el.textContent = '已请求取消...';
+  });
 
   // Modal 操作
   document.getElementById('btnModalCancel')?.addEventListener('click', () => UI.hide('modalBg'));
