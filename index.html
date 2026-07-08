@@ -834,14 +834,29 @@
     };
 
     // ============================================================
-    //  8. Service Worker 注册
+    //  8. Service Worker 清理(已停用 SW,改为 self-unregister)
+    // ------------------------------------------------------------
+    // 原因:旧的 SW (v1) 把 index.html 缓存到 cache 里,导致修复后
+    // 用户手机仍拿到 v1 代码(getProxy() 返空 → 浏览器直连 MiniMax
+    // 被 CORS 挡 → Failed to fetch)。单用户自用 + API key 在 worker
+    // 里,无需离线缓存,这里直接清掉所有 SW。
     // ============================================================
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').catch(err => {
-          console.warn('SW register failed:', err);
-        });
+      // 1) 注销所有已注册的 SW(含旧 v1)
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        for (const r of regs) {
+          r.unregister().catch(() => {});
+        }
       });
+      // 2) 清理旧 SW 留下的 Cache Storage(jingkan-v1 / v2 等)
+      if ('caches' in window) {
+        caches.keys().then(keys => {
+          for (const k of keys) {
+            if (k.startsWith('jingkan-')) caches.delete(k).catch(() => {});
+          }
+        });
+      }
+      // 3) 不再注册新 SW
     }
 
     // ============================================================

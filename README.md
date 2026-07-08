@@ -127,10 +127,11 @@ GitHub 仓库页面 → **Settings** → **Pages**(左侧)→ **Build and deploy
 pwa/
 ├── index.html              ← 全部代码在这(单文件,~600 行)
 ├── manifest.json           ← PWA 元数据
-├── sw.js                   ← Service Worker(离线缓存静态资源)
 ├── cloudflare-worker.js     ← CORS 代理 fallback(只在直接调被挡时部署)
 └── README.md               ← 你正在看的
 ```
+
+> **注意**: 早期版本带 `sw.js`(离线缓存静态资源),已移除。原因:单用户自用 + API key 在 Worker 里,不需要离线缓存;反而 SW 把 index.html 缓存后,代码升级需要用户手动清浏览器缓存,容易踩坑。现 index.html 启动时会主动 `unregister()` 掉旧 SW + 清 `jingkan-*` 缓存,后续 PWA 直连 GitHub Pages,每次都拿最新代码。
 
 **没有**:
 - `package.json` ← 不需要,纯 HTML/JS
