@@ -299,25 +299,58 @@ function start() {
     }
   });
 
-  // 参考图上传处理
+  // 参考图上传处理(带错误显示 + 重复选择支持)
+  const refErr = document.getElementById('modalRefErr');
+  const refOk = document.getElementById('modalRefOk');
+  const setRefError = (msg) => {
+    if (refErr) { refErr.textContent = msg; refErr.classList.remove('hidden'); }
+    if (refOk) refOk.classList.add('hidden');
+  };
+  const setRefOk = (msg) => {
+    if (refOk) { refOk.textContent = msg; refOk.classList.remove('hidden'); }
+    if (refErr) refErr.classList.add('hidden');
+  };
+  const clearRefStatus = () => {
+    if (refErr) refErr.classList.add('hidden');
+    if (refOk) refOk.classList.add('hidden');
+  };
+
   document.getElementById('modalRefUpload')?.addEventListener('change', (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      alert('参考图请小于 2MB');
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const preview = document.getElementById('modalRefPreview');
-      if (preview) {
-        preview.src = reader.result;
-        preview.classList.remove('hidden');
+    try {
+      const file = e.target.files?.[0];
+      if (!file) { clearRefStatus(); return; }
+      if (!file.type.startsWith('image/')) {
+        setRefError('请选择图片文件(支持 jpg/png/gif/webp)');
+        e.target.value = '';
+        return;
       }
-      const removeBtn = document.getElementById('btnRefRemove');
-      if (removeBtn) removeBtn.classList.remove('hidden');
-    };
-    reader.readAsDataURL(file);
+      if (file.size > 2 * 1024 * 1024) {
+        setRefError(`图片过大: ${(file.size / 1024 / 1024).toFixed(2)}MB,最大 2MB(请压缩后再上传)`);
+        e.target.value = '';
+        return;
+      }
+      setRefOk(`已选择 ${file.name} (${(file.size / 1024).toFixed(0)}KB),读取中...`);
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const preview = document.getElementById('modalRefPreview');
+          if (preview) {
+            preview.src = reader.result;
+            preview.classList.remove('hidden');
+          }
+          const removeBtn = document.getElementById('btnRefRemove');
+          if (removeBtn) removeBtn.classList.remove('hidden');
+          setRefOk(`已选择 ${file.name} (${(file.size / 1024).toFixed(0)}KB),点保存生效`);
+        } catch (err) {
+          setRefError('预览失败: ' + err.message);
+        }
+      };
+      reader.onerror = () => setRefError('文件读取失败: ' + (reader.error?.message || '未知错误'));
+      reader.readAsDataURL(file);
+    } catch (err) {
+      setRefError('上传处理异常: ' + err.message);
+    }
   });
 
   document.getElementById('btnRefRemove')?.addEventListener('click', () => {
@@ -330,6 +363,7 @@ function start() {
     if (removeBtn) removeBtn.classList.add('hidden');
     const upload = document.getElementById('modalRefUpload');
     if (upload) upload.value = '';
+    clearRefStatus();
   });
 
   // 历史点击

@@ -456,9 +456,12 @@
       <div class="field">
         <label class="field__label">参考图(可选,影响 prompt 描述)</label>
         <div style="background: #2a2a40; padding: 8px; border-radius: 6px; font-size: 11px; color: #8888a0; margin-bottom: 6px; line-height: 1.5;">
-          ⚠️ 当前 PWA 没有 IP-Adapter 后端,上传的图只会作为 prompt 描述("参考用户上传的人像"),不会真的换脸。完整功能需要 ComfyUI/SDXL 后端。
+          ⚠️ 当前 PWA 没有 IP-Adapter 后端,上传的图只会作为 prompt 描述("参考用户上传的人像"),不会真的换脸。完整功能需要 ComfyUI/SDXL 后端。<br>
+          📏 <b>支持 jpg/png/gif/webp,最大 2MB</b>(大图会被手机拍照时自动加 metadata 超过 2MB,建议先压缩)
         </div>
-        <input type="file" id="modalRefUpload" accept="image/*" style="font-size: 12px;" />
+        <input type="file" id="modalRefUpload" accept="image/jpeg,image/png,image/gif,image/webp" style="font-size: 12px;" />
+        <div id="modalRefOk" class="hidden" style="margin-top: 6px; font-size: 11px; color: #4ade80; padding: 4px 8px; background: #0d3320; border-radius: 4px;"></div>
+        <div id="modalRefErr" class="hidden" style="margin-top: 6px; font-size: 11px; color: #fca5a5; padding: 4px 8px; background: #4a1d1d; border-radius: 4px;"></div>
         <div style="margin-top: 6px;">
           <img id="modalRefPreview" class="hidden" style="max-width: 100px; max-height: 100px; border-radius: 6px; border: 1px solid #2a2a40;" />
           <button type="button" id="btnRefRemove" class="btn-secondary hidden" style="font-size: 11px; padding: 4px 8px; margin-left: 6px;">移除</button>
