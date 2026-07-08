@@ -3,7 +3,7 @@
 // 源:expo-app/src/utils/baziV5.ts (port from algorithm/bazi.py v5, 命理师审核通过 2026-07-05)
 // 依赖:lunar-typescript (通过 importmap 在 index.html 引入)
 
-const { Solar } = window.Lunar; // lunar-typescript UMD 暴露
+import { Solar } from 'lunar-typescript';
 
 // ============ 1. 枚举 / 类型 ============
 

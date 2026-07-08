@@ -309,18 +309,5 @@ function start() {
   renderMain();
 }
 
-// 等待 lunar-typescript 就绪
-if (window.Lunar) {
-  start();
-} else {
-  window.addEventListener('load', () => {
-    // 等待 lunar 加载(importmap 是异步的)
-    let tries = 0;
-    const wait = () => {
-      if (window.Lunar) start();
-      else if (tries < 50) { tries++; setTimeout(wait, 100); }
-      else console.error('lunar-typescript 未加载');
-    };
-    wait();
-  });
-}
+// lunar-typescript 通过 ESM 导入,在 bazi.js 顶层已经完成,直接启动
+start();
