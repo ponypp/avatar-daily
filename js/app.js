@@ -299,7 +299,7 @@ function start() {
     }
   });
 
-  // 参考图上传处理(带错误显示 + 重复选择支持)
+  // 参考图上传处理(自动压缩 + 错误显示 + 重复选择支持)
   const refErr = document.getElementById('modalRefErr');
   const refOk = document.getElementById('modalRefOk');
   const setRefError = (msg) => {
@@ -315,7 +315,44 @@ function start() {
     if (refOk) refOk.classList.add('hidden');
   };
 
-  document.getElementById('modalRefUpload')?.addEventListener('change', (e) => {
+  // 图片自动压缩:限制最大边 800px,JPEG 质量 0.85,几乎任何原图都能压到 < 200KB
+  const compressImage = (file, maxEdge = 800, quality = 0.85) => new Promise((resolve, reject) => {
+    if (!file.type.startsWith('image/')) { reject(new Error('不是图片')); return; }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ratio = Math.min(1, maxEdge / Math.max(img.width, img.height));
+        canvas.width = Math.round(img.width * ratio);
+        canvas.height = Math.round(img.height * ratio);
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+          if (!blob) { reject(new Error('canvas.toBlob 失败')); return; }
+          const r2 = new FileReader();
+          r2.onload = () => resolve({
+            dataUrl: r2.result,
+            originalSize: file.size,
+            compressedSize: blob.size,
+            width: canvas.width,
+            height: canvas.height,
+            name: file.name,
+          });
+          r2.onerror = () => reject(new Error('压缩后读取失败'));
+          r2.readAsDataURL(blob);
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = () => reject(new Error('图片解码失败'));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error('文件读取失败'));
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('modalRefUpload')?.addEventListener('change', async (e) => {
     try {
       const file = e.target.files?.[0];
       if (!file) { clearRefStatus(); return; }
@@ -324,30 +361,26 @@ function start() {
         e.target.value = '';
         return;
       }
-      if (file.size > 2 * 1024 * 1024) {
-        setRefError(`图片过大: ${(file.size / 1024 / 1024).toFixed(2)}MB,最大 2MB(请压缩后再上传)`);
+      if (file.size > 5 * 1024 * 1024) {
+        setRefError(`图片过大: ${(file.size / 1024 / 1024).toFixed(2)}MB,最大 5MB(超 5MB 需要先在相册/微信里压缩)`);
         e.target.value = '';
         return;
       }
-      setRefOk(`已选择 ${file.name} (${(file.size / 1024).toFixed(0)}KB),读取中...`);
+      setRefOk(`已选择 ${file.name} (${(file.size / 1024).toFixed(0)}KB),正在压缩到 800px...`);
 
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const preview = document.getElementById('modalRefPreview');
-          if (preview) {
-            preview.src = reader.result;
-            preview.classList.remove('hidden');
-          }
-          const removeBtn = document.getElementById('btnRefRemove');
-          if (removeBtn) removeBtn.classList.remove('hidden');
-          setRefOk(`已选择 ${file.name} (${(file.size / 1024).toFixed(0)}KB),点保存生效`);
-        } catch (err) {
-          setRefError('预览失败: ' + err.message);
-        }
-      };
-      reader.onerror = () => setRefError('文件读取失败: ' + (reader.error?.message || '未知错误'));
-      reader.readAsDataURL(file);
+      const result = await compressImage(file);
+      const preview = document.getElementById('modalRefPreview');
+      if (preview) {
+        preview.src = result.dataUrl;
+        preview.classList.remove('hidden');
+      }
+      const removeBtn = document.getElementById('btnRefRemove');
+      if (removeBtn) removeBtn.classList.remove('hidden');
+      const ratio = result.compressedSize / result.originalSize;
+      setRefOk(
+        `已压缩 ${(result.originalSize / 1024).toFixed(0)}KB → ${(result.compressedSize / 1024).toFixed(0)}KB ` +
+        `(${(ratio * 100).toFixed(0)}%, ${result.width}×${result.height}),点保存生效`
+      );
     } catch (err) {
       setRefError('上传处理异常: ' + err.message);
     }

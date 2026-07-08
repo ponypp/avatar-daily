@@ -20,16 +20,18 @@
   </script>
   <style>
     /* ===== Reset & Base ===== */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html, body {
       background: #0f0f1a;
       color: #e6e6f0;
       font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      font-size: 14px;
+      font-size: 15px;
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
+      -webkit-text-size-adjust: 100%;
+      overscroll-behavior-y: contain;
     }
-    body { padding-bottom: 80px; }
+    body { padding-bottom: 80px; padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
     .hidden { display: none !important; }
     .muted { color: #6b6b80; font-size: 12px; }
 
@@ -219,15 +221,36 @@
 
     /* ===== Buttons ===== */
     .btn-primary, .btn-secondary {
-      padding: 8px 14px;
+      padding: 12px 18px;
       border-radius: 8px;
-      font-size: 13px;
+      font-size: 14px;
       cursor: pointer;
       border: none;
       font-weight: 500;
+      min-height: 44px;        /* 触摸最小目标 44px */
+      touch-action: manipulation;
+      transition: opacity 0.1s;
     }
+    .btn-primary:active { opacity: 0.7; }
+    .btn-secondary:active { opacity: 0.7; }
     .btn-primary { background: #c9a96e; color: #0f0f1a; }
     .btn-secondary { background: #2a2a40; color: #e6e6f0; }
+
+    /* ===== Reference Upload Button (手机友好的大按钮) ===== */
+    .ref-upload-btn {
+      display: inline-block;
+      background: #2a2a40;
+      color: #e6e6f0;
+      padding: 14px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      border: 1px dashed #4a4a60;
+      min-height: 50px;
+      text-align: center;
+      width: 100%;
+    }
+    .ref-upload-btn:active { background: #3a3a55; }
 
     /* ===== Status ===== */
     #genStatus { text-align: center; padding: 10px; color: #c9a96e; }
@@ -242,15 +265,27 @@
       border-top: 1px solid #2a2a40;
       display: flex;
       justify-content: space-around;
+      align-items: center;
       padding: 8px 0;
       padding-bottom: calc(8px + env(safe-area-inset-bottom));
+      z-index: 50;
     }
     .bottom-nav button {
       background: none;
       border: none;
       color: #8888a0;
-      font-size: 12px;
+      font-size: 13px;
       cursor: pointer;
+      padding: 8px 12px;
+      min-height: 40px;
+      min-width: 60px;
+    }
+    .bottom-nav #btnGenerate {
+      background: #c9a96e;
+      color: #0f0f1a;
+      border-radius: 8px;
+      font-weight: 600;
+      padding: 10px 18px;
     }
 
     /* ===== Modal ===== */
@@ -282,6 +317,17 @@
       margin-bottom: 12px;
     }
     .modal-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; }
+    @media (max-width: 480px) {
+      .modal-actions {
+        position: sticky;
+        bottom: 0;
+        background: #1a1a2e;
+        padding: 12px 0 8px;
+        margin: 16px -14px -14px;
+        border-top: 1px solid #2a2a40;
+      }
+      .modal-actions button { flex: 1; }
+    }
 
     .modal-image { width: 100%; border-radius: 8px; margin: 12px 0; }
 
@@ -334,6 +380,96 @@
 
     /* ===== Compliance ===== */
     .compliance { text-align: center; font-size: 10px; color: #4a4a5a; padding: 10px; }
+
+    /* ===== Mobile Responsive ===== */
+    /* 小屏手机 (≤ 480px) */
+    @media (max-width: 480px) {
+      html, body { font-size: 15px; }
+      .section { padding: 12px 12px; }
+      .section-title { font-size: 13px; margin-bottom: 8px; }
+
+      /* 命盘 4 柱紧凑 */
+      .bazi-pillars { gap: 4px; }
+      .pillar { padding: 8px 4px; }
+      .pillar__gan, .pillar__zhi { font-size: 18px; }
+      .pillar__nayin { font-size: 8px; }
+
+      /* 5 维运势 2×3 网格 */
+      .fortune-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+      .fortune-card { padding: 8px 4px; }
+      .fortune-card__label { font-size: 10px; }
+      .fortune-card__stars { font-size: 11px; }
+      .fortune-card__desc { font-size: 9px; min-height: 32px; }
+
+      /* 7 天预报 — 横滑卡片 6 列 */
+      .forecast-list { display: flex; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
+      .forecast-item { flex-shrink: 0; min-width: 56px; }
+
+      /* 大运 */
+      .dayun-header { grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
+      .dayun-track { overflow-x: auto; }
+
+      /* 头像 */
+      .avatar-actions { flex-direction: column; gap: 8px; }
+      .avatar-actions button { width: 100%; }
+
+      /* 按钮 */
+      .btn-primary, .btn-secondary { padding: 12px 16px; font-size: 14px; min-height: 44px; }
+      .opt-btn { padding: 10px 12px; min-height: 40px; }
+
+      /* Modal 全屏化 */
+      .modal-bg {
+        padding: 0;
+        align-items: stretch;
+      }
+      .modal-card {
+        max-width: 100%;
+        max-height: 100vh;
+        height: 100vh;
+        border-radius: 0;
+        padding: 14px;
+        padding-top: max(14px, env(safe-area-inset-top));
+        padding-bottom: max(14px, env(safe-area-inset-bottom));
+      }
+      .modal-header { font-size: 20px; position: sticky; top: 0; background: #1a1a2e; padding: 8px 0; z-index: 1; }
+
+      /* 底部导航加安全区 */
+      .bottom-nav {
+        padding-bottom: calc(8px + env(safe-area-inset-bottom));
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+      }
+      .bottom-nav button { font-size: 11px; padding: 4px 8px; min-height: 40px; }
+
+      /* Header 干支大字 */
+      .today-ganzhi { font-size: 32px; }
+      .qiyun-stars { font-size: 16px; }
+
+      /* 历史 */
+      .history-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* 中等屏 (481-768px) — 平板竖屏 */
+    @media (min-width: 481px) and (max-width: 768px) {
+      .fortune-grid { grid-template-columns: repeat(3, 1fr); }
+      .history-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    /* 大屏 (≥ 769px) — 桌面 */
+    @media (min-width: 769px) {
+      .history-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+      .fortune-card__desc { min-height: 32px; }
+    }
+
+    /* 横屏模式 */
+    @media (max-width: 900px) and (orientation: landscape) {
+      .modal-card { max-height: 100vh; height: 100vh; border-radius: 0; }
+    }
+
+    /* 防止 iOS Safari 输入框聚焦时页面放大 */
+    @supports (-webkit-touch-callout: none) {
+      input, select, textarea { font-size: 16px; }
+    }
   </style>
 </head>
 <body>
@@ -457,14 +593,17 @@
         <label class="field__label">参考图(可选,影响 prompt 描述)</label>
         <div style="background: #2a2a40; padding: 8px; border-radius: 6px; font-size: 11px; color: #8888a0; margin-bottom: 6px; line-height: 1.5;">
           ⚠️ 当前 PWA 没有 IP-Adapter 后端,上传的图只会作为 prompt 描述("参考用户上传的人像"),不会真的换脸。完整功能需要 ComfyUI/SDXL 后端。<br>
-          📏 <b>支持 jpg/png/gif/webp,最大 2MB</b>(大图会被手机拍照时自动加 metadata 超过 2MB,建议先压缩)
+          📏 <b>支持 jpg/png/gif/webp,最大 5MB</b>(选完会自动压缩到 800px,原图几 MB 都能存)
         </div>
-        <input type="file" id="modalRefUpload" accept="image/jpeg,image/png,image/gif,image/webp" style="font-size: 12px;" />
+        <label class="ref-upload-btn">
+          <input type="file" id="modalRefUpload" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;" />
+          <span>📷 选择图片</span>
+        </label>
         <div id="modalRefOk" class="hidden" style="margin-top: 6px; font-size: 11px; color: #4ade80; padding: 4px 8px; background: #0d3320; border-radius: 4px;"></div>
         <div id="modalRefErr" class="hidden" style="margin-top: 6px; font-size: 11px; color: #fca5a5; padding: 4px 8px; background: #4a1d1d; border-radius: 4px;"></div>
-        <div style="margin-top: 6px;">
-          <img id="modalRefPreview" class="hidden" style="max-width: 100px; max-height: 100px; border-radius: 6px; border: 1px solid #2a2a40;" />
-          <button type="button" id="btnRefRemove" class="btn-secondary hidden" style="font-size: 11px; padding: 4px 8px; margin-left: 6px;">移除</button>
+        <div style="margin-top: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <img id="modalRefPreview" class="hidden" style="max-width: 120px; max-height: 120px; border-radius: 6px; border: 1px solid #2a2a40;" />
+          <button type="button" id="btnRefRemove" class="btn-secondary hidden" style="font-size: 12px; padding: 6px 10px;">移除</button>
         </div>
       </div>
     </div>
