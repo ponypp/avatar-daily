@@ -143,23 +143,51 @@ export const UI = {
     const el = $('today-avatar');
     if (!el) return;
     if (avatar && avatar.imageDataUrl) {
+      // 用内联 onclick,绕开事件代理的坑
       el.innerHTML = `
         <div class="avatar-card">
-          <img src="${avatar.imageDataUrl}" alt="今日头像" class="avatar-img" />
+          <img src="${avatar.imageDataUrl}" alt="今日头像" class="avatar-img" id="todayAvatarImg" />
           <div class="avatar-actions">
-            <button class="btn-secondary" data-action="save">保存到相册</button>
-            <button class="btn-secondary" data-action="fav">${Store.isFavorite(avatar.date) ? '★ 已收藏' : '☆ 收藏'}</button>
-            <button class="btn-primary" data-action="regen">重新生成</button>
+            <button type="button" class="btn-secondary" id="btnSaveAvatar">保存到相册</button>
+            <button type="button" class="btn-secondary" id="btnFavAvatar">${Store.isFavorite(avatar.date) ? '★ 已收藏' : '☆ 收藏'}</button>
+            <button type="button" class="btn-primary" id="btnRegenAvatar">重新生成</button>
           </div>
         </div>
       `;
+      // 立即绑定 onclick
+      document.getElementById('btnSaveAvatar')?.addEventListener('click', () => {
+        const a = document.createElement('a');
+        a.href = avatar.imageDataUrl;
+        a.download = `avatar-${avatar.date}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      });
+      document.getElementById('btnFavAvatar')?.addEventListener('click', () => {
+        const isFav = Store.toggleFavorite(avatar.date);
+        this.renderTodayAvatar(avatar); // 重新渲染按钮文字
+        if (isFav) {
+          const el2 = document.createElement('div');
+          el2.className = 'toast';
+          el2.textContent = '已收藏 ⭐';
+          document.body.appendChild(el2);
+          setTimeout(() => el2.remove(), 2000);
+        }
+      });
+      document.getElementById('btnRegenAvatar')?.addEventListener('click', () => {
+        // 触发自定义事件,让 app.js 处理
+        document.dispatchEvent(new CustomEvent('app:regenerate'));
+      });
     } else {
       el.innerHTML = `
         <div class="avatar-empty">
           <div class="avatar-empty__text">今日头像还没生成</div>
-          <button class="btn-primary" data-action="generate">生成今日头像</button>
+          <button type="button" class="btn-primary" id="btnGenAvatar">生成今日头像</button>
         </div>
       `;
+      document.getElementById('btnGenAvatar')?.addEventListener('click', () => {
+        document.dispatchEvent(new CustomEvent('app:generate'));
+      });
     }
   },
 
@@ -184,12 +212,14 @@ export const UI = {
   renderUser(user) {
     const el = $('user-card');
     if (!el || !user) return;
+    const hasRef = user.referenceImage && user.referenceImage.startsWith('data:');
     el.innerHTML = `
       <div class="user-row"><span class="user-label">生日</span><span>${user.birthDate} ${user.birthTime || '?'}</span></div>
       <div class="user-row"><span class="user-label">性别</span><span>${GENDERS.find(g => g.id === user.gender)?.label || '?'}</span></div>
       <div class="user-row"><span class="user-label">风格</span><span>${user.style}</span></div>
       <div class="user-row"><span class="user-label">场景</span><span>${user.scene || '?'}</span></div>
       <div class="user-row"><span class="user-label">格言</span><span>${user.motto || '(空)'}</span></div>
+      <div class="user-row"><span class="user-label">参考图</span><span>${hasRef ? '已上传(仅作 prompt 描述)' : '未上传'}</span></div>
     `;
   },
 
@@ -225,6 +255,19 @@ export const UI = {
     // 调性
     const toneBtns = document.querySelectorAll('#modalToneRow .opt-btn');
     toneBtns.forEach(b => b.classList.toggle('opt-btn--active', b.dataset.value === (u.tone || '神秘')));
+
+    // 参考图预览
+    const refPreview = $('modalRefPreview');
+    const refRemove = $('btnRefRemove');
+    if (u.referenceImage && u.referenceImage.startsWith('data:')) {
+      refPreview.src = u.referenceImage;
+      refPreview.classList.remove('hidden');
+      if (refRemove) refRemove.classList.remove('hidden');
+    } else {
+      refPreview.src = '';
+      refPreview.classList.add('hidden');
+      if (refRemove) refRemove.classList.add('hidden');
+    }
   },
 
   collectProfileForm() {

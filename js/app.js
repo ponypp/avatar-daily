@@ -269,9 +269,12 @@ function start() {
 
   // 按钮绑定
   document.getElementById('btnGenerate')?.addEventListener('click', onGenerate);
-  document.getElementById('btnRegen')?.addEventListener('click', onGenerate);
   document.getElementById('btnEditProfile')?.addEventListener('click', () => UI.openProfileModal(Store.getUser()));
   document.getElementById('btnSettings')?.addEventListener('click', () => UI.openSettingsModal());
+
+  // 监听头像区自定义事件(由 ui.js 渲染头像时绑定后 dispatch)
+  document.addEventListener('app:generate', () => onGenerate());
+  document.addEventListener('app:regenerate', () => onGenerate());
 
   // Modal 操作
   document.getElementById('btnModalCancel')?.addEventListener('click', () => UI.hide('modalBg'));
@@ -280,6 +283,9 @@ function start() {
     if (title === '个人资料') {
       const u = UI.collectProfileForm();
       if (!u.birthDate) { alert('请填写生日'); return; }
+      // 收集参考图
+      const refImg = document.getElementById('modalRefPreview')?.src;
+      if (refImg && refImg.startsWith('data:')) u.referenceImage = refImg;
       Store.setUser(u);
       UI.hide('modalBg');
       renderMain();
@@ -293,13 +299,37 @@ function start() {
     }
   });
 
-  // 头像区按钮代理(渲染后绑定)
-  document.body.addEventListener('click', (e) => {
-    const t = e.target;
-    if (t.dataset.action === 'generate') onGenerate();
-    if (t.dataset.action === 'regen') onGenerate();
-    if (t.dataset.action === 'save') onSaveImage();
-    if (t.dataset.action === 'fav') onToggleFav();
+  // 参考图上传处理
+  document.getElementById('modalRefUpload')?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert('参考图请小于 2MB');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const preview = document.getElementById('modalRefPreview');
+      if (preview) {
+        preview.src = reader.result;
+        preview.classList.remove('hidden');
+      }
+      const removeBtn = document.getElementById('btnRefRemove');
+      if (removeBtn) removeBtn.classList.remove('hidden');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('btnRefRemove')?.addEventListener('click', () => {
+    const preview = document.getElementById('modalRefPreview');
+    if (preview) {
+      preview.src = '';
+      preview.classList.add('hidden');
+    }
+    const removeBtn = document.getElementById('btnRefRemove');
+    if (removeBtn) removeBtn.classList.add('hidden');
+    const upload = document.getElementById('modalRefUpload');
+    if (upload) upload.value = '';
   });
 
   // 历史点击
