@@ -7,306 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="精看日常" />
-  <title>精看日常 · 每日头像</title>
+  <title>精看日常 · 每日头像与命理参考</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%231a1a2e'/><text x='50%25' y='52%25' text-anchor='middle' dominant-baseline='middle' font-size='80' font-family='serif' fill='%23ffd700'>精</text></svg>" />
-  <style>
-    /* ====== 玄学风配色 + 移动优先 ====== */
-    :root {
-      --bg: #0f0f1a;
-      --bg-2: #1a1a2e;
-      --bg-3: #252540;
-      --gold: #ffd700;
-      --gold-muted: #d4af37;
-      --text: #e8e8f0;
-      --text-muted: #999;
-      --danger: #ff5252;
-      --success: #4caf50;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { background: var(--bg); color: var(--text); }
-    body {
-      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
-      font-size: 28rpx;
-      line-height: 1.6;
-      min-height: 100vh;
-      padding: 0 0 80px;
-    }
-    main { max-width: 720px; margin: 0 auto; padding: 16px; }
-    @media (min-width: 720px) { body { font-size: 16px; } main { padding: 32px; } }
-    h1, h2, h3 { font-weight: 600; letter-spacing: 1px; }
-    .text-gold { color: var(--gold); }
-    .text-muted { color: var(--text-muted); }
-    .text-center { text-align: center; }
-    .flex { display: flex; }
-    .flex-col { display: flex; flex-direction: column; }
-    .gap-1 { gap: 8px; } .gap-2 { gap: 12px; } .gap-3 { gap: 20px; }
-    .hidden { display: none !important; }
-
-    /* ====== 头部 ====== */
-    .header {
-      text-align: center;
-      padding: 32px 0 24px;
-      border-bottom: 1rpx solid rgba(255,215,0,0.1);
-      margin-bottom: 24px;
-    }
-    .header__title {
-      font-size: 56rpx;
-      font-weight: 700;
-      color: var(--gold);
-      letter-spacing: 12rpx;
-      text-shadow: 0 0 32rpx rgba(255,215,0,0.2);
-      margin-bottom: 8px;
-    }
-    .header__sub { font-size: 24rpx; color: var(--text-muted); letter-spacing: 4rpx; }
-
-    /* ====== 卡片 ====== */
-    .card {
-      background: var(--bg-2);
-      border-radius: 20rpx;
-      padding: 28rpx;
-      margin-bottom: 24rpx;
-      border: 1rpx solid rgba(255,215,0,0.08);
-    }
-    .card--gold {
-      background: linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(255,140,0,0.04) 100%);
-      border-color: rgba(255,215,0,0.2);
-    }
-    .card__title {
-      font-size: 30rpx;
-      color: var(--gold);
-      margin-bottom: 16rpx;
-      font-weight: 600;
-    }
-    .card__row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 0;
-      gap: 12px;
-    }
-    .card__row + .card__row { border-top: 1rpx solid rgba(255,255,255,0.05); }
-    .card__label { color: var(--text-muted); font-size: 24rpx; }
-    .card__value { color: var(--text); font-size: 28rpx; }
-
-    /* ====== 表单 ====== */
-    .field { margin-bottom: 20rpx; }
-    .field__label {
-      display: block;
-      font-size: 24rpx;
-      color: var(--text-muted);
-      margin-bottom: 8rpx;
-    }
-    input[type="date"], input[type="time"], input[type="text"], input[type="password"], select, textarea {
-      width: 100%;
-      background: var(--bg-3);
-      color: var(--text);
-      border: 1rpx solid rgba(255,215,0,0.2);
-      border-radius: 12rpx;
-      padding: 16rpx 20rpx;
-      font-size: 28rpx;
-      font-family: inherit;
-    }
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--gold);
-    }
-    input[type="color"] { padding: 4rpx; height: 60rpx; }
-
-    .style-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12rpx;
-    }
-    @media (min-width: 600px) { .style-grid { grid-template-columns: repeat(3, 1fr); } }
-    .style-item {
-      padding: 20rpx 16rpx;
-      border: 2rpx solid rgba(255,215,0,0.3);
-      border-radius: 16rpx;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 26rpx;
-    }
-    .style-item--active {
-      background: linear-gradient(135deg, rgba(255,215,0,0.2) 0%, rgba(255,140,0,0.1) 100%);
-      color: var(--gold);
-      border-color: var(--gold);
-      font-weight: 600;
-    }
-
-    /* ====== 按钮 ====== */
-    .btn {
-      display: block;
-      width: 100%;
-      padding: 24rpx 32rpx;
-      border-radius: 50rpx;
-      font-size: 32rpx;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      text-align: center;
-      transition: all 0.2s;
-      font-family: inherit;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--gold) 0%, #ff8c00 100%);
-      color: #0f0f1a;
-    }
-    .btn-primary[disabled] {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .btn-secondary {
-      background: transparent;
-      color: var(--gold);
-      border: 2rpx solid var(--gold);
-    }
-    .btn-ghost {
-      background: transparent;
-      color: var(--text-muted);
-      border: 1rpx solid var(--text-muted);
-    }
-    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12rpx; }
-
-    /* ====== 结果区 ====== */
-    .pillars {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12rpx;
-      margin: 20rpx 0;
-    }
-    .pillar {
-      background: var(--bg-3);
-      border-radius: 12rpx;
-      padding: 20rpx 8rpx;
-      text-align: center;
-    }
-    .pillar--day {
-      background: linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(255,140,0,0.08) 100%);
-      border: 1rpx solid var(--gold);
-    }
-    .pillar__label { font-size: 22rpx; color: var(--text-muted); margin-bottom: 8rpx; }
-    .pillar__gz { font-size: 36rpx; font-weight: 600; color: var(--text); }
-    .pillar--day .pillar__gz { color: var(--gold); }
-
-    .stars {
-      display: flex;
-      justify-content: center;
-      gap: 8rpx;
-      font-size: 40rpx;
-      margin: 12rpx 0;
-    }
-    .star { color: rgba(255,215,0,0.2); }
-    .star--on { color: var(--gold); }
-
-    .avatar-img {
-      width: 100%;
-      max-width: 480px;
-      border-radius: 20rpx;
-      display: block;
-      margin: 20rpx auto;
-      box-shadow: 0 0 40rpx rgba(255,215,0,0.15);
-    }
-    .avatar-empty {
-      width: 100%;
-      height: 360rpx;
-      background: var(--bg-3);
-      border-radius: 20rpx;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-muted);
-      font-size: 26rpx;
-      margin: 20rpx 0;
-    }
-
-    /* ====== 历史 ====== */
-    .history-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12rpx;
-    }
-    .history-item {
-      position: relative;
-      aspect-ratio: 1;
-      border-radius: 12rpx;
-      overflow: hidden;
-      background: var(--bg-3);
-    }
-    .history-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .history-item__date {
-      position: absolute;
-      bottom: 4rpx;
-      left: 4rpx;
-      right: 4rpx;
-      padding: 2rpx 6rpx;
-      background: rgba(0,0,0,0.6);
-      color: var(--text);
-      font-size: 18rpx;
-      text-align: center;
-    }
-
-    /* ====== Loading / Error ====== */
-    .loading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40rpx;
-      color: var(--text-muted);
-      gap: 12rpx;
-    }
-    .spinner {
-      width: 24rpx;
-      height: 24rpx;
-      border: 3rpx solid rgba(255,215,0,0.2);
-      border-top-color: var(--gold);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .alert {
-      padding: 16rpx 20rpx;
-      border-radius: 12rpx;
-      margin: 12rpx 0;
-      font-size: 24rpx;
-    }
-    .alert-error {
-      background: rgba(255,82,82,0.15);
-      border: 1rpx solid var(--danger);
-      color: #ff8a8a;
-    }
-    .alert-info {
-      background: rgba(76,175,80,0.15);
-      border: 1rpx solid var(--success);
-      color: #8bc88b;
-    }
-    .modal-bg {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.7);
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    .modal {
-      background: var(--bg-2);
-      border: 1rpx solid var(--gold);
-      border-radius: 20rpx;
-      padding: 28rpx;
-      max-width: 480px;
-      width: 100%;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-    .modal__title { font-size: 30rpx; color: var(--gold); margin-bottom: 20rpx; font-weight: 600; }
-  </style>
-
+  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' x='5'>精</text></svg>" />
+  <!-- lunar-typescript via importmap -->
   <script type="importmap">
   {
     "imports": {
@@ -314,569 +18,466 @@
     }
   }
   </script>
+  <style>
+    /* ===== Reset & Base ===== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: #0f0f1a;
+      color: #e6e6f0;
+      font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    body { padding-bottom: 80px; }
+    .hidden { display: none !important; }
+    .muted { color: #6b6b80; font-size: 12px; }
+
+    /* ===== Sections ===== */
+    .section {
+      padding: 14px 16px;
+      border-bottom: 1px solid #1f1f30;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #c9a96e;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+    .section-title::before { content: "· "; }
+
+    /* ===== Header / Today's Date ===== */
+    .today-header {
+      text-align: center;
+      padding: 16px 0 10px;
+    }
+    .today-date { font-size: 13px; color: #8888a0; }
+    .today-ganzhi { font-size: 28px; font-weight: 600; color: #c9a96e; margin: 4px 0; }
+    .today-qiyun { margin-top: 6px; }
+    .qiyun-stars { font-size: 18px; letter-spacing: 2px; }
+    .qiyun-mood { font-size: 12px; color: #8888a0; margin-top: 2px; }
+
+    /* ===== 命盘 (四柱) ===== */
+    .bazi-pillars {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .pillar {
+      background: #1a1a2e;
+      border: 1px solid #2a2a40;
+      border-radius: 8px;
+      padding: 10px 6px;
+      text-align: center;
+    }
+    .pillar--day { border-color: #c9a96e; background: #2a1f10; }
+    .pillar__label { font-size: 11px; color: #8888a0; margin-bottom: 4px; }
+    .pillar__gan { font-size: 22px; color: #c9a96e; font-weight: 600; }
+    .pillar--day .pillar__gan { color: #f5d68a; }
+    .pillar__zhi { font-size: 22px; color: #e6e6f0; }
+    .pillar__nayin { font-size: 9px; color: #6b6b80; margin-top: 2px; }
+
+    /* ===== 用神 ===== */
+    .ys-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+    .ys-label { color: #8888a0; width: 40px; }
+    .ys-value { color: #c9a96e; }
+    .ys-yong { font-size: 16px; font-weight: 600; }
+    .ys-tag {
+      background: #2a2a40;
+      color: #8888a0;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+    .ys-tag--warn { background: #4a2820; color: #f5a0a0; }
+
+    /* ===== 神煞 ===== */
+    .shensha-block { display: flex; flex-wrap: wrap; gap: 6px; }
+    .shensha-tag {
+      background: #2a2440;
+      color: #a8a0d0;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+    }
+
+    /* ===== 5 维运势 ===== */
+    .fortune-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+    @media (max-width: 380px) { .fortune-grid { grid-template-columns: repeat(2, 1fr); } }
+    .fortune-card {
+      background: #1a1a2e;
+      border: 1px solid #2a2a40;
+      border-radius: 8px;
+      padding: 8px 6px;
+      text-align: center;
+    }
+    .fortune-card__header { display: flex; justify-content: center; align-items: center; gap: 3px; margin-bottom: 2px; }
+    .fortune-card__emoji { font-size: 14px; }
+    .fortune-card__label { font-size: 11px; font-weight: 600; }
+    .fortune-card__stars { font-size: 12px; letter-spacing: 1px; margin: 2px 0; }
+    .fortune-card__desc { font-size: 10px; color: #8888a0; line-height: 1.4; min-height: 28px; }
+
+    /* ===== 7 天预报 ===== */
+    .forecast-list {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+    .forecast-item {
+      background: #1a1a2e;
+      border: 1px solid #2a2a40;
+      border-radius: 6px;
+      padding: 6px 2px;
+      text-align: center;
+    }
+    .forecast-item__day { font-size: 11px; color: #c9a96e; font-weight: 600; }
+    .forecast-item__date { font-size: 9px; color: #6b6b80; }
+    .forecast-item__gz { font-size: 11px; color: #e6e6f0; margin: 2px 0; }
+    .forecast-item__stars { font-size: 10px; letter-spacing: 0; }
+
+    /* ===== 大运/流年 ===== */
+    .dayun-header {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .dayun-label { font-size: 10px; color: #6b6b80; }
+    .dayun-current, .dayun-liunian, .dayun-age { font-size: 14px; color: #c9a96e; font-weight: 600; }
+    .dayun-track { display: flex; gap: 4px; overflow-x: auto; padding: 4px 0; }
+    .dayun-step {
+      flex-shrink: 0;
+      width: 36px;
+      text-align: center;
+      padding: 4px;
+      border: 1px solid #2a2a40;
+      border-radius: 4px;
+      background: #1a1a2e;
+    }
+    .dayun-step--current { border-color: #c9a96e; background: #2a1f10; }
+    .dayun-step__age { font-size: 9px; color: #6b6b80; }
+    .dayun-step__zhi { font-size: 14px; color: #e6e6f0; }
+
+    /* ===== 今日头像 ===== */
+    .avatar-card { text-align: center; }
+    .avatar-img {
+      max-width: 100%;
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+    .avatar-actions { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+    .avatar-empty { text-align: center; padding: 30px 0; }
+    .avatar-empty__text { color: #6b6b80; margin-bottom: 16px; }
+
+    /* ===== 历史 ===== */
+    .history-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 6px;
+    }
+    .history-item {
+      position: relative;
+      cursor: pointer;
+      border-radius: 8px;
+      overflow: hidden;
+      aspect-ratio: 1;
+    }
+    .history-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .history-item__date {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,0.7));
+      color: white;
+      font-size: 10px;
+      padding: 2px 4px;
+    }
+    .history-item__star {
+      position: absolute;
+      top: 2px;
+      right: 4px;
+      color: #fbbf24;
+      font-size: 14px;
+    }
+
+    /* ===== 用户卡 ===== */
+    .user-card { font-size: 12px; }
+    .user-row { display: flex; gap: 8px; padding: 3px 0; }
+    .user-label { color: #8888a0; width: 50px; }
+
+    /* ===== Buttons ===== */
+    .btn-primary, .btn-secondary {
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      border: none;
+      font-weight: 500;
+    }
+    .btn-primary { background: #c9a96e; color: #0f0f1a; }
+    .btn-secondary { background: #2a2a40; color: #e6e6f0; }
+
+    /* ===== Status ===== */
+    #genStatus { text-align: center; padding: 10px; color: #c9a96e; }
+
+    /* ===== Bottom Nav ===== */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1a1a2e;
+      border-top: 1px solid #2a2a40;
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0;
+      padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    }
+    .bottom-nav button {
+      background: none;
+      border: none;
+      color: #8888a0;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    /* ===== Modal ===== */
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+    .modal-card {
+      background: #1a1a2e;
+      border: 1px solid #2a2a40;
+      border-radius: 12px;
+      padding: 16px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-card--large { max-width: 90vw; }
+    .modal-header {
+      font-size: 18px;
+      font-weight: 600;
+      color: #c9a96e;
+      margin-bottom: 12px;
+    }
+    .modal-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; }
+
+    .modal-image { width: 100%; border-radius: 8px; margin: 12px 0; }
+
+    .field { margin-bottom: 12px; }
+    .field__label { display: block; font-size: 12px; color: #8888a0; margin-bottom: 4px; }
+    .field input, .field textarea {
+      width: 100%;
+      background: #0f0f1a;
+      border: 1px solid #2a2a40;
+      color: #e6e6f0;
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .field textarea { resize: vertical; min-height: 50px; }
+
+    /* ===== Option Button Row ===== */
+    .opt-row { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
+    .opt-btn {
+      background: #0f0f1a;
+      border: 1px solid #2a2a40;
+      color: #e6e6f0;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      min-width: 50px;
+    }
+    .opt-btn--active { background: #c9a96e; color: #0f0f1a; border-color: #c9a96e; }
+    .opt-btn--mini { padding: 3px 8px; font-size: 11px; }
+    .opt-btn__desc { font-size: 9px; color: #6b6b80; margin-top: 1px; }
+    .opt-btn--active .opt-btn__desc { color: #1a1a2e; }
+
+    /* ===== Toast ===== */
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #c9a96e;
+      color: #0f0f1a;
+      padding: 8px 16px;
+      border-radius: 8px;
+      z-index: 200;
+      font-size: 13px;
+    }
+
+    /* ===== Empty ===== */
+    .empty { text-align: center; color: #6b6b80; padding: 20px; }
+
+    /* ===== Compliance ===== */
+    .compliance { text-align: center; font-size: 10px; color: #4a4a5a; padding: 10px; }
+  </style>
 </head>
 <body>
-  <main>
-    <!-- 头部 -->
-    <header class="header">
-      <h1 class="header__title">精看日常</h1>
-      <div class="header__sub" id="todaySub">加载中…</div>
-    </header>
 
-    <!-- 用户档案(出生信息) -->
-    <section class="card" id="profileCard">
-      <div class="card__title">你的信息</div>
-      <div class="card__row">
-        <span class="card__label">生于</span>
-        <span class="card__value" id="profileBirth">—</span>
-      </div>
-      <div class="card__row">
-        <span class="card__label">风格</span>
-        <span class="card__value" id="profileStyle">—</span>
-      </div>
-      <button class="btn btn-ghost" style="margin-top:16px" id="btnEditProfile">编辑</button>
-    </section>
+<!-- 今日概览 -->
+<div class="section">
+  <div id="today-header"></div>
+  <div style="text-align:center; margin-top: 8px;">
+    <button id="btnEditProfile" class="btn-secondary" style="font-size: 11px; padding: 4px 10px;">个人资料</button>
+    <button id="btnSettings" class="btn-secondary" style="font-size: 11px; padding: 4px 10px;">设置</button>
+  </div>
+</div>
 
-    <!-- 今日生成 -->
-    <section class="card card--gold">
-      <div class="card__title">今日头像</div>
-      <div id="todayInfo" class="text-muted" style="margin-bottom: 16rpx;">—</div>
-      <div id="todayStars" class="stars" style="display:none"></div>
-      <button class="btn btn-primary" id="btnGenerate">生成今日头像</button>
-      <div id="genStatus" class="loading hidden">
-        <span class="spinner"></span>
-        <span>排盘 + AI 绘图中(约 10-20 秒)</span>
-      </div>
-    </section>
+<!-- 命盘 -->
+<div class="section">
+  <div class="section-title">命盘</div>
+  <div id="bazi-pillars" class="bazi-pillars"></div>
+  <div id="yongshen-block" style="margin-top: 12px;"></div>
+  <div id="shensha-block" class="shensha-block" style="margin-top: 8px;"></div>
+</div>
 
-    <!-- 结果 -->
-    <section class="card hidden" id="resultCard">
-      <div class="card__title" id="resultDate">—</div>
-      <div class="pillars" id="resultPillars"></div>
-      <div class="card__row" style="border-top:0;padding-top:8px">
-        <span class="card__label">用神</span>
-        <span class="card__value text-gold" id="resultYongShen" style="font-size:32rpx">—</span>
-      </div>
-      <div class="card__row">
-        <span class="card__label">提示</span>
-        <span class="card__value" id="resultAdvice" style="font-size:24rpx;line-height:1.5">—</span>
-      </div>
-      <img id="resultImg" class="avatar-img hidden" alt="今日头像" />
-      <div id="resultEmpty" class="avatar-empty hidden">点击上方按钮生成</div>
-      <div class="btn-row" id="resultActions" style="margin-top:24rpx">
-        <button class="btn btn-secondary" id="btnSave">保存图片</button>
-        <button class="btn btn-ghost" id="btnRegen">重新生成</button>
-      </div>
-    </section>
+<!-- 5 维运势 -->
+<div class="section">
+  <div class="section-title">今日运势</div>
+  <div id="fortune-grid" class="fortune-grid"></div>
+</div>
 
-    <!-- 历史 -->
-    <section class="card">
-      <div class="card__title">历史头像</div>
-      <div id="historyEmpty" class="text-muted text-center" style="padding:40rpx 0">
-        还没有生成过
+<!-- 7 天预报 -->
+<div class="section">
+  <div class="section-title">未来 7 日</div>
+  <div id="forecast-list" class="forecast-list"></div>
+</div>
+
+<!-- 大运/流年 -->
+<div class="section">
+  <div class="section-title">大运流年</div>
+  <div id="dayun-block"></div>
+</div>
+
+<!-- 今日头像 -->
+<div class="section">
+  <div class="section-title">今日头像</div>
+  <div id="today-avatar"></div>
+  <div id="genStatus" class="hidden">排盘 + AI 绘图中(约 10-20 秒)</div>
+</div>
+
+<!-- 历史头像 -->
+<div class="section">
+  <div class="section-title">历史头像</div>
+  <div id="history-grid" class="history-grid"></div>
+</div>
+
+<!-- 用户信息 -->
+<div class="section">
+  <div class="section-title">个人资料</div>
+  <div id="user-card" class="user-card"></div>
+</div>
+
+<div class="compliance">本应用仅供文化娱乐参考,不构成专业命理建议</div>
+
+<!-- 底部导航 -->
+<div class="bottom-nav">
+  <button onclick="document.getElementById('today-header').scrollIntoView({behavior:'smooth'})">↑ 顶</button>
+  <button id="btnGenerate">生成今日</button>
+  <button onclick="document.getElementById('history-grid').scrollIntoView({behavior:'smooth'})">↓ 历史</button>
+</div>
+
+<!-- Modal: 个人资料 / 设置 -->
+<div id="modalBg" class="modal-bg hidden">
+  <div class="modal-card">
+    <div class="modal-header" id="modalTitle">个人资料</div>
+
+    <!-- 个人资料表单 -->
+    <div id="modalProfileForm">
+      <div class="field">
+        <label class="field__label">生日(公历)</label>
+        <input type="date" id="modalBirthDate" />
       </div>
-      <div id="historyGrid" class="history-grid hidden"></div>
-    </section>
+      <div class="field">
+        <label class="field__label">出生时间(可空,默认 12:00)</label>
+        <input type="time" id="modalBirthTime" />
+      </div>
 
-    <!-- 设置按钮 -->
-    <button class="btn btn-ghost" id="btnSettings" style="margin-top: 24rpx">⚙ 设置</button>
+      <div class="field">
+        <label class="field__label">性别</label>
+        <div id="modalGenderRow" class="opt-row"></div>
+      </div>
 
-    <div class="text-muted text-center" style="margin-top: 40rpx; font-size: 22rpx">
-      本应用仅供文化娱乐,不构成专业命理建议
+      <div class="field">
+        <label class="field__label">头像风格(PRD 4.1.1)</label>
+        <div id="modalStyleRow" class="opt-row"></div>
+      </div>
+
+      <div class="field">
+        <label class="field__label">场景(PRD 4.1.4)</label>
+        <div id="modalSceneRow" class="opt-row"></div>
+      </div>
+
+      <div class="field">
+        <label class="field__label">素材类型(PRD 4.1.3,人像+人像时才用参照)</label>
+        <div id="modalMaterialRow" class="opt-row"></div>
+      </div>
+
+      <div class="field">
+        <label class="field__label">人脸引用强度(PRD 4.1.2)</label>
+        <div id="modalFaceRefRow" class="opt-row"></div>
+      </div>
+
+      <div class="field">
+        <label class="field__label">调性(L4 风格修饰)</label>
+        <div id="modalToneRow" class="opt-row"></div>
+      </div>
+
+      <div class="field">
+        <label class="field__label">个人格言(30-100 字,影响 prompt + 解读)</label>
+        <textarea id="modalMotto" maxlength="100" placeholder="例:心若不动,风又奈何"></textarea>
+        <div id="modalMottoRow" class="opt-row" style="margin-top: 4px;"></div>
+      </div>
     </div>
-  </main>
 
-  <!-- 设置/编辑 modal -->
-  <div class="modal-bg hidden" id="modalBg">
-    <div class="modal" id="modal">
-      <div class="modal__title" id="modalTitle">设置</div>
-      <div id="modalBody"></div>
-      <div class="btn-row" style="margin-top: 20rpx">
-        <button class="btn btn-ghost" id="btnModalCancel">取消</button>
-        <button class="btn btn-primary" id="btnModalSave">保存</button>
+    <!-- 设置表单 -->
+    <div id="modalSettingsForm" class="hidden">
+      <div class="field">
+        <label class="field__label">CORS 代理 URL(已默认填好,需自己部署可改)</label>
+        <input type="text" id="modalProxy" placeholder="https://your-worker.workers.dev" />
       </div>
+      <div class="field">
+        <label class="field__label">MiniMax API Key(可选,worker 已代持)</label>
+        <input type="password" id="modalKey" placeholder="sk-cp-..." />
+      </div>
+      <div style="background: #2a2a40; padding: 10px; border-radius: 6px; font-size: 12px; color: #8888a0; line-height: 1.6;">
+        ⚙ API key 只存浏览器本地(localStorage),不会上传。<br>
+        代理 URL 已默认指向已部署的 Cloudflare Worker。
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button id="btnModalCancel" class="btn-secondary">取消</button>
+      <button id="btnModalSave" class="btn-primary">保存</button>
     </div>
   </div>
+</div>
 
-  <script type="module">
-    // ============================================================
-    //  1. 状态管理(localStorage)
-    // ============================================================
-    const LS = {
-      user: 'jingkan_user',           // { birthDate, birthTime, style }
-      avatars: 'jingkan_avatars',     // [{ date, bazi, imageDataUrl, prompt }]
-      minimaxKey: 'jingkan_minimax_key',
-      proxyUrl: 'jingkan_proxy_url',  // 可选 CORS 代理
-    };
-    // 默认 Cloudflare Worker 代理 — 浏览器直接调 MiniMax 会被 CORS 拒绝,
-    // 已部署的 worker 替代用户处理 CORS。可在「设置」覆盖为自己部署的地址。
-    const DEFAULT_PROXY = 'https://twilight-mouse-eceb.dadagigi1240.workers.dev';
-    const MAX_HISTORY = 30;
-
-    function getUser() {
-      try { return JSON.parse(localStorage.getItem(LS.user) || 'null'); }
-      catch { return null; }
-    }
-    function setUser(u) { localStorage.setItem(LS.user, JSON.stringify(u)); }
-    function getAvatars() {
-      try { return JSON.parse(localStorage.getItem(LS.avatars) || '[]'); }
-      catch { return []; }
-    }
-    function setAvatars(a) { localStorage.setItem(LS.avatars, JSON.stringify(a)); }
-    function getKey() { return localStorage.getItem(LS.minimaxKey) || ''; }
-    function getProxy() { return localStorage.getItem(LS.proxyUrl) || DEFAULT_PROXY; }
-
-    // ============================================================
-    //  2. 5 风格 + 提示词构造
-    // ============================================================
-    const STYLES = [
-      { id: '东方插画', label: '东方插画', hint: 'eastern illustration, soft cinematic, gold accents, elegant' },
-      { id: '水墨',     label: '水墨写意', hint: 'ink wash painting, monochrome, calligraphy strokes, atmospheric' },
-      { id: '工笔',     label: '工笔重彩', hint: 'meticulous gongbi painting, vibrant pigments, fine lines, intricate' },
-      { id: '潮流',     label: '潮流卡牌', hint: 'modern collectible card, holographic, sharp contrast, vibrant' },
-      { id: '像素',     label: '像素艺术', hint: 'pixel art, retro game aesthetic, dithered shading, crisp' },
-    ];
-    const NEGATIVE = 'blurry, distorted, ugly, low quality, watermark, text, nsfw, extra fingers, deformed, disfigured';
-
-    function buildPrompt({ style, primaryElement }) {
-      const s = STYLES.find(x => x.id === style) || STYLES[0];
-      return [
-        s.hint,
-        'mystical fortune-telling portrait, subtle ' + primaryElement + ' elemental aura',
-        'cinematic rim lighting, golden ratio composition, 4k, highly detailed, masterpiece',
-      ].join(', ');
-    }
-
-    // ============================================================
-    //  3. 八字计算(简化 v5 算法,基于 lunar-typescript)
-    // ============================================================
-    const { Solar } = await import('lunar-typescript');
-
-    // 天干 → 五行
-    const STEM_ELEMENT = {
-      '甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'
-    };
-
-    function calculateBazi(year, month, day, hour) {
-      const solar = Solar.fromYmd(year, month, day);
-      const solarWithHour = Solar.fromYmdHms(year, month, day, hour, 0, 0);
-      const lunar = solar.getLunar();
-      const lunar2 = solarWithHour.getLunar();
-      const yGZ = lunar.getYearInGanZhi();
-      const mGZ = lunar.getMonthInGanZhi();
-      const dGZ = lunar.getDayInGanZhi();
-      const hGZ = lunar2.getTimeInGanZhi();
-      const yGan = yGZ.charAt(0);
-      const mGan = mGZ.charAt(0);
-      const dGan = dGZ.charAt(0);
-      const hGan = hGZ.charAt(0);
-      const yZhi = yGZ.charAt(1);
-      const mZhi = mGZ.charAt(1);
-      const dZhi = dGZ.charAt(1);
-      const hZhi = hGZ.charAt(1);
-      // 五行统计
-      const elementCount = { 木:0, 火:0, 土:0, 金:0, 水:0 };
-      [yGan, mGan, dGan, hGan].forEach(g => {
-        if (STEM_ELEMENT[g]) elementCount[STEM_ELEMENT[g]]++;
-      });
-      // 日主五行
-      const dayElement = STEM_ELEMENT[dGan] || '土';
-      // 简化"用神"算法:缺哪行就用哪行
-      let yongShen = '土';
-      let minCount = 999;
-      for (const [el, cnt] of Object.entries(elementCount)) {
-        if (cnt < minCount) { minCount = cnt; yongShen = el; }
-      }
-      // 简化"运势星":看日支与今日日支的五行关系(同=5,生=4,克=3,泄=2,耗=1)
-      // 拿日支与日主元素的差:
-      const zhiElement = {
-        '子':'水','亥':'水','寅':'木','卯':'木','辰':'土','巳':'火',
-        '午':'火','未':'土','申':'金','酉':'金','戌':'土','丑':'土'
-      };
-      // 简化:今日运势 4-5 星随机(根据用神命中数)
-      const yongShenCount = elementCount[yongShen];
-      const stars = Math.min(5, Math.max(2, yongShenCount + 2));
-      // 简化建议
-      const advice = adviceByYongShen(yongShen, stars);
-      return {
-        ganzhi: dGZ,        // 主干支用日柱
-        year: yGZ, month: mGZ, day: dGZ, hour: hGZ,
-        yearGan: yGan, monthGan: mGan, dayGan: dGan, hourGan: hGan,
-        yearZhi: yZhi, monthZhi: mZhi, dayZhi: dZhi, hourZhi: hZhi,
-        primaryElement: dayElement,
-        yongShen,
-        elementCount,
-        stars,
-        advice,
-      };
-    }
-
-    function adviceByYongShen(el, stars) {
-      const map = {
-        木: '宜亲近自然、读书、东方木艺。忌金属利器争执。',
-        火: '宜社交表达、文创活动。忌水边独处、过度内敛。',
-        土: '宜稳定作息、家居整理。忌频繁迁动、投机取巧。',
-        金: '宜决断、清理旧物。忌犹豫、火边急躁。',
-        水: '宜学习、流动、灵活沟通。忌固步自封、久坐不动。',
-      };
-      const base = map[el] || '保持觉察,顺势而为。';
-      return stars >= 4 ? `运势上扬,${base}` : `稳中求进,${base}`;
-    }
-
-    // ============================================================
-    //  4. MiniMax API 调用
-    // ============================================================
-    async function generateImage({ prompt, negativePrompt, apiKey, proxyUrl }) {
-      const body = {
-        model: 'image-01',
-        prompt,
-        negative_prompt: negativePrompt,
-        aspect_ratio: '1:1',
-        n: 1,
-        response_format: 'url',
-      };
-      let url, headers;
-      if (proxyUrl) {
-        url = proxyUrl.replace(/\/$/, '') + '/image_generation';
-        headers = { 'Content-Type': 'application/json' };
-      } else {
-        url = 'https://api.minimaxi.com/v1/image_generation';
-        headers = {
-          'Authorization': 'Bearer ' + apiKey,
-          'Content-Type': 'application/json',
-        };
-      }
-      const resp = await fetch(url, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(body),
-      });
-      const data = await resp.json();
-      if (!resp.ok) {
-        throw new Error(`HTTP ${resp.status}: ${JSON.stringify(data).slice(0, 200)}`);
-      }
-      if (data.base_resp && data.base_resp.status_code !== 0) {
-        throw new Error(`MiniMax 业务错误 ${data.base_resp.status_code}: ${data.base_resp.status_msg}`);
-      }
-      const imageUrl = data?.data?.image_urls?.[0];
-      if (!imageUrl) {
-        throw new Error('MiniMax 响应里没找到 image_urls[0]: ' + JSON.stringify(data).slice(0, 300));
-      }
-      // 优先用 worker 已经代理好的 base64 dataUrl(避免浏览器直连 OSS 被 CORS 挡)
-      // 旧 PWA 走直连 OSS: const imgResp = await fetch(imageUrl); ...
-      if (data?.data?.dataUrl && data.data.dataUrl.startsWith('data:')) {
-        return { dataUrl: data.data.dataUrl, rawUrl: imageUrl };
-      }
-      // 兜底:没代理时自己 fetch(可能因 OSS CORS 失败)
-      const imgResp = await fetch(imageUrl);
-      const blob = await imgResp.blob();
-      const dataUrl = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-      return { dataUrl, rawUrl: imageUrl };
-    }
-
-    // ============================================================
-    //  5. UI 渲染
-    // ============================================================
-    const $ = (id) => document.getElementById(id);
-    function show(id) { $(id)?.classList.remove('hidden'); }
-    function hide(id) { $(id)?.classList.add('hidden'); }
-
-    function todayIso() {
-      const d = new Date();
-      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    }
-    function formatTodayChinese() {
-      const d = new Date();
-      return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;
-    }
-
-    function renderHeader() {
-      $('todaySub').textContent = formatTodayChinese();
-    }
-    function renderProfile() {
-      const u = getUser();
-      if (u) {
-        const style = STYLES.find(s => s.id === u.style) || STYLES[0];
-        $('profileBirth').textContent = u.birthDate + (u.birthTime ? ' ' + u.birthTime : '');
-        $('profileStyle').textContent = style.label;
-        hide('profileEmpty');
-      } else {
-        $('profileBirth').textContent = '(未设置)';
-        $('profileStyle').textContent = '(未设置)';
-      }
-    }
-
-    function renderStars(stars) {
-      const container = $('todayStars');
-      container.innerHTML = '';
-      for (let i = 0; i < 5; i++) {
-        const span = document.createElement('span');
-        span.className = 'star' + (i < stars ? ' star--on' : '');
-        span.textContent = '★';
-        container.appendChild(span);
-      }
-      show('todayStars');
-    }
-
-    function renderResult(record) {
-      $('resultDate').textContent = record.date;
-      $('resultPillars').innerHTML = [
-        ['年柱', record.bazi.year, ''],
-        ['月柱', record.bazi.month, ''],
-        ['日柱', record.bazi.day, 'pillar--day'],
-        ['时柱', record.bazi.hour, ''],
-      ].map(([label, gz, cls]) => `
-        <div class="pillar ${cls}">
-          <div class="pillar__label">${label}</div>
-          <div class="pillar__gz">${gz}</div>
-        </div>
-      `).join('');
-      $('resultYongShen').textContent = `${record.bazi.yongShen}(${record.bazi.stars}星)`;
-      $('resultAdvice').textContent = record.bazi.advice;
-      if (record.imageDataUrl) {
-        $('resultImg').src = record.imageDataUrl;
-        show('resultImg');
-        hide('resultEmpty');
-        show('resultActions');
-      } else {
-        hide('resultImg');
-        show('resultEmpty');
-      }
-      show('resultCard');
-    }
-
-    function renderTodayInfo() {
-      const rec = getAvatars().find(a => a.date === todayIso());
-      if (rec) {
-        $('todayInfo').textContent = `已有今日头像 · 运势 ${rec.bazi.stars} 星 · 八字 ${rec.bazi.ganzhi}`;
-        renderStars(rec.bazi.stars);
-      } else {
-        $('todayInfo').textContent = '今天还没生成';
-        $('todayInfo').classList.add('text-muted');
-        $('todayStars').style.display = 'none';
-      }
-    }
-
-    function renderHistory() {
-      const list = getAvatars();
-      if (list.length === 0) {
-        show('historyEmpty');
-        hide('historyGrid');
-        return;
-      }
-      hide('historyEmpty');
-      $('historyGrid').innerHTML = list.map(a => {
-        const dateShort = a.date.slice(5); // MM-DD
-        return `
-          <div class="history-item" data-date="${a.date}">
-            ${a.imageDataUrl ? `<img src="${a.imageDataUrl}" alt="${a.date}">` : ''}
-            <div class="history-item__date">${dateShort} · ${a.bazi?.stars || '?'}★</div>
-          </div>
-        `;
-      }).join('');
-      show('historyGrid');
-      $('historyGrid').querySelectorAll('.history-item').forEach(el => {
-        el.onclick = () => {
-          const date = el.dataset.date;
-          const rec = getAvatars().find(a => a.date === date);
-          if (rec) renderResult(rec);
-        };
-      });
-    }
-
-    // ============================================================
-    //  6. 主流程
-    // ============================================================
-    async function onGenerate() {
-      const u = getUser();
-      const apiKey = getKey();
-      if (!u) { openProfileModal(); return; }
-      if (!apiKey) { openSettingsModal(); return; }
-
-      show('genStatus');
-      $('btnGenerate').disabled = true;
-
-      try {
-        // 1) 算八字
-        const [y, m, d] = u.birthDate.split('-').map(Number);
-        const hour = u.birthTime
-          ? Number(u.birthTime.split(':')[0]) || 12
-          : 12;
-        const today = todayIso();
-        const bazi = calculateBazi(y, m, d, hour);
-
-        // 2) 拼 prompt
-        const prompt = buildPrompt({ style: u.style, primaryElement: bazi.primaryElement });
-
-        // 3) 调 MiniMax
-        const { dataUrl } = await generateImage({
-          prompt,
-          negativePrompt: NEGATIVE,
-          apiKey,
-          proxyUrl: getProxy(),
-        });
-
-        // 4) 保存
-        const rec = { date: today, bazi, imageDataUrl: dataUrl, prompt, style: u.style };
-        const list = getAvatars().filter(a => a.date !== today);
-        list.unshift(rec);
-        if (list.length > MAX_HISTORY) list.length = MAX_HISTORY;
-        setAvatars(list);
-
-        // 5) 渲染
-        renderResult(rec);
-        renderTodayInfo();
-        renderHistory();
-      } catch (err) {
-        // CORS / 401 / 余额 / etc
-        const msg = (err && err.message) || String(err);
-        const isCors = msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('CORS');
-        const hint = isCors
-          ? '浏览器无法直连 MiniMax(CORS 限制)。默认代理 URL 已填好,确认 设置 → CORS 代理 URL 没被清空;如代理也连不上,可能是 worker 失效或网络问题。'
-          : '请检查 API key、网络、模型余额。';
-        alert('生成失败:\n\n' + msg + '\n\n' + hint);
-      } finally {
-        hide('genStatus');
-        $('btnGenerate').disabled = false;
-      }
-    }
-
-    function onSave() {
-      const rec = getAvatars().find(a => a.date === todayIso());
-      if (!rec?.imageDataUrl) {
-        alert('没有今天的头像可保存');
-        return;
-      }
-      const a = document.createElement('a');
-      a.href = rec.imageDataUrl;
-      a.download = `jingkan-${rec.date}.jpg`;
-      a.click();
-    }
-
-    // ============================================================
-    //  7. Modals
-    // ============================================================
-    function openProfileModal() {
-      $('modalTitle').textContent = getUser() ? '编辑信息' : '先设置你的信息';
-      const u = getUser() || { birthDate: '', birthTime: '', style: '东方插画' };
-      $('modalBody').innerHTML = `
-        <div class="field">
-          <label class="field__label">公历生日</label>
-          <input type="date" id="modalBirthDate" value="${u.birthDate || ''}" />
-        </div>
-        <div class="field">
-          <label class="field__label">出生时辰(可选)</label>
-          <input type="time" id="modalBirthTime" value="${u.birthTime || ''}" />
-        </div>
-        <div class="field">
-          <label class="field__label">头像风格</label>
-          <div class="style-grid" id="modalStyleGrid">
-            ${STYLES.map(s => `
-              <div class="style-item ${s.id === u.style ? 'style-item--active' : ''}" data-id="${s.id}">
-                ${s.label}
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-      // 风格点击
-      $('modalStyleGrid').querySelectorAll('.style-item').forEach(el => {
-        el.onclick = () => {
-          $('modalStyleGrid').querySelectorAll('.style-item').forEach(x => x.classList.remove('style-item--active'));
-          el.classList.add('style-item--active');
-        };
-      });
-      show('modalBg');
-    }
-
-    function openSettingsModal() {
-      $('modalTitle').textContent = '设置';
-      $('modalBody').innerHTML = `
-        <div class="field">
-          <label class="field__label">MiniMax API Key (sk-cp-...)</label>
-          <input type="password" id="modalKey" value="${getKey()}" placeholder="sk-cp-..." />
-        </div>
-        <div class="field">
-          <label class="field__label">CORS 代理 URL(已默认填好,需自己部署可改)</label>
-          <input type="text" id="modalProxy" value="${getProxy()}" placeholder="${DEFAULT_PROXY}" />
-        </div>
-        <div class="alert alert-info">
-          ⚙ API key 只存你浏览器本地(localStorage),不会上传任何服务器。<br><br>
-          代理 URL 已默认指向预部署的 Cloudflare Worker,清空则回退到无代理(可能被浏览器 CORS 挡)。
-        </div>
-      `;
-      show('modalBg');
-    }
-
-    $('btnModalCancel').onclick = () => hide('modalBg');
-    $('btnModalSave').onclick = () => {
-      const title = $('modalTitle').textContent;
-      if (title === '设置') {
-        const k = $('modalKey').value.trim();
-        const p = $('modalProxy').value.trim();
-        if (k) localStorage.setItem(LS.minimaxKey, k);
-        else localStorage.removeItem(LS.minimaxKey);
-        if (p) localStorage.setItem(LS.proxyUrl, p);
-        else localStorage.removeItem(LS.proxyUrl);
-        hide('modalBg');
-      } else {
-        // 编辑 profile
-        const bd = $('modalBirthDate').value;
-        const bt = $('modalBirthTime').value;
-        const active = $('modalStyleGrid').querySelector('.style-item--active');
-        const style = active?.dataset.id || '东方插画';
-        if (!bd) { alert('请填写生日'); return; }
-        setUser({ birthDate: bd, birthTime: bt, style });
-        renderProfile();
-        renderTodayInfo();
-        hide('modalBg');
-      }
-    };
-
-    // ============================================================
-    //  8. Service Worker 清理(已停用 SW,改为 self-unregister)
-    // ------------------------------------------------------------
-    // 原因:旧的 SW (v1) 把 index.html 缓存到 cache 里,导致修复后
-    // 用户手机仍拿到 v1 代码(getProxy() 返空 → 浏览器直连 MiniMax
-    // 被 CORS 挡 → Failed to fetch)。单用户自用 + API key 在 worker
-    // 里,无需离线缓存,这里直接清掉所有 SW。
-    // ============================================================
-    if ('serviceWorker' in navigator) {
-      // 1) 注销所有已注册的 SW(含旧 v1)
-      navigator.serviceWorker.getRegistrations().then(regs => {
-        for (const r of regs) {
-          r.unregister().catch(() => {});
-        }
-      });
-      // 2) 清理旧 SW 留下的 Cache Storage(jingkan-v1 / v2 等)
-      if ('caches' in window) {
-        caches.keys().then(keys => {
-          for (const k of keys) {
-            if (k.startsWith('jingkan-')) caches.delete(k).catch(() => {});
-          }
-        });
-      }
-      // 3) 不再注册新 SW
-    }
-
-    // ============================================================
-    //  9. 事件绑定 + 启动
-    // ============================================================
-    $('btnEditProfile').onclick = openProfileModal;
-    $('btnSettings').onclick = openSettingsModal;
-    $('btnGenerate').onclick = onGenerate;
-    $('btnSave').onclick = onSave;
-    $('btnRegen').onclick = onGenerate;
-
-    renderHeader();
-    renderProfile();
-    renderTodayInfo();
-    renderHistory();
-  </script>
+<!-- 入口 -->
+<script type="module" src="js/app.js"></script>
 </body>
 </html>
