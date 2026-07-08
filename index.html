@@ -408,6 +408,9 @@
       minimaxKey: 'jingkan_minimax_key',
       proxyUrl: 'jingkan_proxy_url',  // 可选 CORS 代理
     };
+    // 默认 Cloudflare Worker 代理 — 浏览器直接调 MiniMax 会被 CORS 拒绝,
+    // 已部署的 worker 替代用户处理 CORS。可在「设置」覆盖为自己部署的地址。
+    const DEFAULT_PROXY = 'https://twilight-mouse-eceb.dadagigi1240.workers.dev';
     const MAX_HISTORY = 30;
 
     function getUser() {
@@ -421,7 +424,7 @@
     }
     function setAvatars(a) { localStorage.setItem(LS.avatars, JSON.stringify(a)); }
     function getKey() { return localStorage.getItem(LS.minimaxKey) || ''; }
-    function getProxy() { return localStorage.getItem(LS.proxyUrl) || ''; }
+    function getProxy() { return localStorage.getItem(LS.proxyUrl) || DEFAULT_PROXY; }
 
     // ============================================================
     //  2. 5 风格 + 提示词构造
@@ -729,7 +732,7 @@
         const msg = (err && err.message) || String(err);
         const isCors = msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('CORS');
         const hint = isCors
-          ? '可能是 CORS 限制(浏览器直接调 MiniMax 被拒)。需要部署 cloudflare-worker 代理,在 设置 → 代理 URL 填。'
+          ? '浏览器无法直连 MiniMax(CORS 限制)。默认代理 URL 已填好,确认 设置 → CORS 代理 URL 没被清空;如代理也连不上,可能是 worker 失效或网络问题。'
           : '请检查 API key、网络、模型余额。';
         alert('生成失败:\n\n' + msg + '\n\n' + hint);
       } finally {
@@ -794,12 +797,12 @@
           <input type="password" id="modalKey" value="${getKey()}" placeholder="sk-cp-..." />
         </div>
         <div class="field">
-          <label class="field__label">CORS 代理 URL(可选)</label>
-          <input type="text" id="modalProxy" value="${getProxy()}" placeholder="https://your-worker.workers.dev" />
+          <label class="field__label">CORS 代理 URL(已默认填好,需自己部署可改)</label>
+          <input type="text" id="modalProxy" value="${getProxy()}" placeholder="${DEFAULT_PROXY}" />
         </div>
         <div class="alert alert-info">
           ⚙ API key 只存你浏览器本地(localStorage),不会上传任何服务器。<br><br>
-          代理 URL:如浏览器直接调 MiniMax 被 CORS 挡,部署 <code>cloudflare-worker.js</code> 后填这里。
+          代理 URL 已默认指向预部署的 Cloudflare Worker,清空则回退到无代理(可能被浏览器 CORS 挡)。
         </div>
       `;
       show('modalBg');

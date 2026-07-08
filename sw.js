@@ -9,7 +9,7 @@
  * 缓存策略:cache-first for static;network-only for everything else
  */
 
-const CACHE_NAME = 'jingkan-v1';
+const CACHE_NAME = 'jingkan-v2';
 const STATIC_ASSETS = [
   './',
   './index.html',
