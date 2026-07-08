@@ -3,7 +3,7 @@
 // 基于 v5 八字 + 流日干支 + 喜神集
 
 import { getDailyGanzhi, calculateQiYun, TIANGAN_WUXING, DIZHI_WUXING, calculateDaYun } from './bazi.js';
-import { FORTUNE_DIMENSIONS, WUXING } from './constants.js';
+import { FORTUNE_DIMENSIONS } from './constants.js';
 
 const WUXING_KE = { '木': '土', '火': '金', '土': '水', '金': '木', '水': '火' };
 
