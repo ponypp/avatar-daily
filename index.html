@@ -562,7 +562,12 @@
       if (!imageUrl) {
         throw new Error('MiniMax 响应里没找到 image_urls[0]: ' + JSON.stringify(data).slice(0, 300));
       }
-      // 拉回图片 → 转 base64(因为 URL ~24h 过期,要存到 localStorage)
+      // 优先用 worker 已经代理好的 base64 dataUrl(避免浏览器直连 OSS 被 CORS 挡)
+      // 旧 PWA 走直连 OSS: const imgResp = await fetch(imageUrl); ...
+      if (data?.data?.dataUrl && data.data.dataUrl.startsWith('data:')) {
+        return { dataUrl: data.data.dataUrl, rawUrl: imageUrl };
+      }
+      // 兜底:没代理时自己 fetch(可能因 OSS CORS 失败)
       const imgResp = await fetch(imageUrl);
       const blob = await imgResp.blob();
       const dataUrl = await new Promise((resolve, reject) => {
